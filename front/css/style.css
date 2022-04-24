@@ -266,3 +266,7 @@ footer .footerSecondary {
 		width: 75%;
 	}
 }
+
+.hidden {
+	display: none;
+}
