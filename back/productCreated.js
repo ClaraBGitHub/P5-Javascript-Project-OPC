@@ -76,7 +76,7 @@ cart.addEventListener('click', () => {
                 productFinded = true;
             }
         };
-        if  (productFinded == false) { // le boolean me permet de vérifier une condition est vérifiée
+        if  (productFinded == false) { // le boolean me permet de vérifier si une condition est vérifiée
             productArray.push(products); // Send data
             localStorage.setItem("productsInCart", JSON.stringify(productArray)); // Storing data and convert a JS object into a string (otherwise it can't be store in localstorage)
         }
