@@ -6,13 +6,12 @@ if (cart == null) {
 } 
 var total = 0;
 var totalQuantity = 0;
-
-const promises = cart.map(cartElement => {
+const promises = cart.map(cartElement => { // La méthode map me retourne un nouveau tableau avec chaque élément d'un tableau (ici cart). Ce nouveau tableau est stocké dans la const promises. 
     return fetch ("http://localhost:3000/api/products/"+cartElement._id).then(response => {
         return response.json();
     })
 });
-Promise.all(promises).then(products => {
+Promise.all(promises).then(products => { //Promise.all va me retourner une promesse de toutes les promesse comprisent dans mon argument. Ici la const promises  
     cart.forEach(element => { // Je boucle chaque element de mon cart
         var kanape = null;
         products.forEach(product => {
@@ -23,9 +22,9 @@ Promise.all(promises).then(products => {
         template = document.getElementById("template");
         node = template.cloneNode(true); //Je clone mon template dans "node"
         //data-id
-        template.dataset.id = element._id;
+        node.dataset.id = element._id;
         //data-color
-        template.dataset.color = element.color;
+        node.dataset.color = element.color;
         // Image
         node.querySelector('[id=cart__item__img]').src = kanape.imageUrl;
         // Name
@@ -38,11 +37,12 @@ Promise.all(promises).then(products => {
         var quantityDisplay = node.querySelector('[class=itemQuantity]');
         quantityDisplay.value = parseInt(element.quantity);
 
+        //remove hidden from my template
+        node.classList.remove("hidden");
+
         // Price
         var priceDisplay = node.querySelector('[id=priceKanape]');
-        priceDisplay.textContent = kanape.price;
-
-        node.classList.remove("hidden");
+        priceDisplay.textContent = kanape.price+" €";
         document.getElementById('cart__items').appendChild(node); //Le noeud est ajouté au document
 
         // Final price
@@ -54,77 +54,152 @@ Promise.all(promises).then(products => {
         //Final product quantity
         var quantityElement = document.getElementById('totalQuantity');
         let finalQuantity = element.quantity;
-        totalQuantity += finalQuantity;
+        totalQuantity += parseInt(finalQuantity);
         quantityElement.textContent = totalQuantity;
         
-        deleteButton = node.querySelector('[class=deleteItem]');
+        // Remove an item from the cart
+        var deleteButton = node.querySelector('[class=deleteItem]');
         deleteButton.addEventListener('click', (event) => {
             newCart = [];
             cart.forEach(elt => {
-               if (elt._id != element._id || elt.color != element.color) {
+               if (elt._id != element._id || elt.color != element.color) { //if l'élément en cours de notre nouveau cart est différent de l'élément de notre ancien cart alors on met à jour le cart 
                    newCart.push(elt);
                }
-           })
+            })
            localStorage.setItem("productsInCart", JSON.stringify(newCart));
            location.reload();
         });
-    })
-});
+        
+        // Add quantity from the cart
+        var cartQuantity = node.querySelector('[class=itemQuantity]');
+        cartQuantity.addEventListener('change', (_) => {
+            var newQuantity = cartQuantity.value;
+            for (var i = 0; i<cart.length; i++) { //cart.length
+                if (cart[i]._id == element._id && cart[i].color == element.color){ // if l'élément sur lequel j'ai cliqué est le même que celui de mon panier
+                    cart[i].quantity = newQuantity;
+                    localStorage.setItem("productsInCart", JSON.stringify(cart));
+                    location.reload();
+                 }
+            }
+        })
+    });
+})
 
+//form
+    //Regex
+var nameRegex = /[A-Za-z_, '.-]{2,}(?![0-9])$/;
+var addressRegex = /[\w, '.-]{2,}/;
+var cityRegex = /([A-Za-z,_'.-]){2,}(?![0-9])$/;
+var emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-// Cart EventListener --> Ajout d'une quantité à mon panier
-// var cartQuantity = document.querySelector('[class=itemQuantity]');
-// cartQuantity.forEach(change => {
-//         console.log(cartQuantity)
-//         console.log("test du changement");
-//         change.addEventListener('change', () => {
-//         if (cart._id == change.dataset.id && cart.color == change.dataset.color) {
-//             console.log(change.value)
-//             cart.quantity = parseInt(change.value),
-//             localStorage.setItem('productsInCart', JSON.stringify(cart));
-//         }
-//     })
-// });
+    //FirstName
+var firstNameEntry = document.getElementById('firstName');
+var firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+var validFirstName = false;
+firstNameEntry.addEventListener('input', (event) => {
+    var firstaNameInput = event.target.value;
+    if (nameRegex.test(firstaNameInput.trim())) {
+        firstNameErrorMsg.textContent = " ";
+        validFirstName = true;
+    } else {
+        firstNameErrorMsg.textContent = "Le prénom n'est pas valide";
+    }
+  })
 
-// 1- Je veux que lorsque j’ajoute une quantité depuis mon panier (addEvent), cela vient modifier mon local storage.
-// J’écouté le changement de quantité sur ma page panier
-// Je récupère cette quantité
-// Je la push dans mon local storage
+    //LastName
+var lastNameEntry = document.getElementById('lastName');
+var lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
+var validLastName = false;
+lastNameEntry.addEventListener('input', (event) => {
+    var lastNameInput = event.target.value;
+    if (nameRegex.test(lastNameInput.trim())) {
+        lastNameErrorMsg.textContent = " ";
+        validLastName = true;
+    } else {
+        lastNameErrorMsg.textContent = "Le nom n'est pas valide";
+    }
+})
+    //Adress
+var adressEntry = document.getElementById('address');
+var addressErrorMsg = document.getElementById('addressErrorMsg');
+var validaddress = false;
+adressEntry.addEventListener('input', (event) =>{
+    var addressInput = event.target.value;
+    if (addressRegex.test(addressInput.trim())) {
+        addressErrorMsg.textContent =  " ";
+        validaddress = true;
+    } else {
+        addressErrorMsg.textContent="L'adresse n'est pas valide";
+    }
+})
+    // City
+var cityEntry = document.getElementById('city');
+var cityErrorMsg = document.getElementById('cityErrorMsg');
+var validCity = false;
+cityEntry.addEventListener('input', (event) =>{
+    var cityInput = event.target.value;
+    if (cityRegex.test(cityInput.trim())) {
+        cityErrorMsg.textContent = " ";
+        validCity = true;
+    } else {
+        cityErrorMsg.textContent="La ville n'est pas valide";
+    }
+})
+    // Email
+var emailEntry = document.getElementById('email');
+var emailErrorMsg = document.getElementById('emailErrorMsg');
+var validEmail = false;
+emailEntry.addEventListener('input', (event) => {
+    var emailInput = event.target.value;
+    if (emailRegex.test(emailInput.trim())) {
+        emailErrorMsg.textContent = " ";
+        validEmail = true;
+    } else {
+        emailErrorMsg.textContent = "L'adresse email n'est pas valide";
+    }
+})
 
+// Form validation 
 
-// Cart delete product 
-
-// var deleteButtons = document.getElementsByClassName('deleteItem');
-// Array.from(deleteButtons).forEach(button => {
-//     button.addEventListener('click', (id, color) => {
-//         alert('toto')
-//     });
-// })
-// deleteButton.addEventListener('click', (id, color) => {
-//     alert("toto")
-//     console.log(id, color)
-        // for (let i = 0; i < cart.length; i++) {
-        //     // console.log(id, color);
-        //     if (cart[i]._id == element.dataset.id && cart[i].color == element.dataset.color) {
-        //         cart.splice(i, 1);
-        //         console.log("supprimé");
-        //         return (
-        //             localStorage.removeItem("productsInCart"),
-        //             location.reload()
-        //         )
-        //     }
-        // }
-    // })
-
-
-// 2- Lorsque je clique sur le bouton « supprimer », cela supprime le Kanape de mon local storage et de ma page panier.
-// J’écouté le clique sur le bouton de ma page panier
-// Je supprime l’objet en question de mon local storage ET de ma page panier
-
-
-
-
-
+var validateOrder = document.getElementById('form-order');
+validateOrder.addEventListener('submit', (event)=> {
+    event.preventDefault();
+    var products = [];
+    for (let i = 0; i<cart.length;i++) {
+        products.push(cart[i]._id);
+    }
+    var contactInfo = { 
+        contact : {
+        firstName : firstNameEntry.value,
+        lastName : lastNameEntry.value,
+        address : adressEntry.value,
+        city : cityEntry.value,
+        email : emailEntry.value,
+        },
+        products
+    };
+    console.log(validFirstName,validLastName, validaddress, validCity,validEmail)
+    if (validFirstName==true && validLastName==true && validaddress==true && validCity==true && validEmail==true){
+        fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contactInfo)
+        })
+        .then((res) => {
+            return res.json()
+        })
+        .then((data) => {
+            console.log(data)
+            localStorage.removeItem("productsInCart");
+            window.location.href = "confirmation.html?orderId="+data.orderId;
+        })
+     
+    } else {
+        alert ('Les informations renseignée ne sont pas valides');
+    }
+})
 
 
 
@@ -133,14 +208,6 @@ Promise.all(promises).then(products => {
 
 
 // 1er essai :
-
-// Je récupère mon panier dans le localStorage
-// total = 0;
-// Pour chacun des élements du tableau (boucle)
-//   total = total + prix du produit en cours
-//   Je vais récupérer les informations du produit en cour
-//   Je construit mon html (templating)
-//   J'affiche mon produit
 
 // var containerPanier = document.querySelector('[class=cart__item]');
 // var total = 0;
@@ -186,6 +253,3 @@ Promise.all(promises).then(products => {
 //             // console.log(priceDisplay);
 //             document.querySelector('[class=cart__item]').appendChild(node); //Le noeud est ajouté au document
 //         })
-        
-//     });     
-// }
