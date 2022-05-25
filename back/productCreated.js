@@ -63,11 +63,26 @@ cart.addEventListener('click', () => {
     let productArray = JSON.parse(localStorage.getItem("productsInCart")); // Je récupère le panier "productsInCart" dans localStorage et je le "parse" (= cela devient un objet JS). Les infos sont stockées dans productArray 
     if (productArray == null){ // Si rien n'est selectionné = arrray vide  
         productArray = [];
+        if (amountSelected <= 0 ) {
+            alert("Le nombre d'article doit être supérieur à 0")
+            return;
+        }
+        if (amountSelected >100) {
+            alert("Le nombre d'article doit être inférieur à 100")
+            return;
+        }
     productArray.push(products); // Send data to my products template
     localStorage.setItem("productsInCart", JSON.stringify(productArray)); // Storing data in key "productsInCart" and convert a JS object into a string (otherwise it can't be store in localstorage)
     }
     else  {
-        console.log(productArray.length);
+        if (amountSelected <= 0 ) {
+            alert("Le nombre d'article doit être supérieur à 0")
+            return;
+        }
+        if (amountSelected >100) {
+            alert("Le nombre d'article doit être inférieur à 100")
+            return;
+        }
         productFinded = false;
         for (var i=0; i<productArray.length; i++) {
             if (productArray[i]._id == products._id && productArray[i].color == products.color) { //important d'ajouter le [i] car on parle de l'élément dans lequel on boucle à l'instant

@@ -11,7 +11,7 @@ const promises = cart.map(cartElement => { // La méthode map me retourne un nou
         return response.json();
     })
 });
-Promise.all(promises).then(products => { //Promise.all va me retourner une promesse de toutes les promesse comprisent dans mon argument. Ici la const promises  
+Promise.all(promises).then(products => { //Promise.all va me retourner une promesse de toutes les promesses comprises dans mon argument. Ici la const promises  
     cart.forEach(element => { // Je boucle chaque element de mon cart
         var kanape = null;
         products.forEach(product => {
@@ -43,6 +43,7 @@ Promise.all(promises).then(products => { //Promise.all va me retourner une prome
         // Price
         var priceDisplay = node.querySelector('[id=priceKanape]');
         priceDisplay.textContent = kanape.price+" €";
+        
         document.getElementById('cart__items').appendChild(node); //Le noeud est ajouté au document
 
         // Final price
